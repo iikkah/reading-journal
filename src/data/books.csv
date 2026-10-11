@@ -1,38 +1,38 @@
-book_id,title,author,publication_year,isbn,format,notes
-1,Spoon river anthology, Edgar Lee Masters,1915,,Physical,
-2,The great gatsby, F. Scott Fitzgerald,1925,,Physical,
-3,Vierastila,Miki Liukkonen,2023,,Physical,
-4,Ensimmäinen persoona, Haruki Murakami,2020,,Physical,
-5,Henkien talo, Isabel Allende,1982,,Physical,
-6,Kafka Ranna, Haruki Murakami,2002,,Physical,
-7,Olemisen sietämätön keveys, Milan Kundera,1984,,Physical,
-8,Mies joka kuoli,Antti Tuomainen,2016,,Physical,
-9,Elolliset,Iida Turpeinen,2023,,Physical,
-10,Ikipuut,Richard Powers,2018,,Physical,
-11,Bras Cubasin kuoleman jälkeiset muistelmat,Joaquim Maria Machado de Assis,1881,,Physical,
-12,Kuin surmaisi satakielen,Harper Lee,1960,,Physical,
-13,Vieterilintukronikka,Haruki Murakami,1995,,Physical,
-14,CTRL + Alt Kaaos,Joe Tidy,2025,,Physical,
-15,Vanhus ja meri,Ernest Hemingway,1952,,Physical,
-16,Candide,Voltaire,1759,,Physical,
-17,1984,George Orwell,1949,,Physical,
-18,Norwegian Wood,Haruki Murakami,1987,,Physical,
-19,Pintaremontti,Miika Nousiainen,2020,,Audiobook,
-20,Orjattaresi,Margaret Atwood,1985,,Physical,
-21,Jäähyväiset aseille,Ernest Hemingway,1929,,Physical,
-22,Hiiriä ja ihmisiä,John Steinbeck,1937,,Physical,
-23,Itselleni,Marcus Aurelius,,,Physical,Publication year unknown
-24,Vihan hedelmät,John Steinbeck,1939,,Physical,
-25,Kuolema iltapäivällä,Ernest Hemingway,1932,,Physical,
-26,Humiseva Harju,Emily Bronte,1847,,Physical,
-27,Dorian Grayn muotokuva,Oscar Wilde,1980,,Physical,
-28,Project Hail Mary,Andy Weir,2021,,Physical,
-29,Kaikki isäni hotellit,John Irving,1981,,Physical,
-30,Viimeinen toivomus,Andrzej Sapkowski,1993,,Ebook,
-31,Saatana saapuu Moskovaan,Bulgakov,1967,,Ebook,
-32,Kohtalon miekka,Andrzej Sapkowski,1992,,Ebook,
-33,The Road,Cormac McCarthy,2006,,Ebook,
-34,Lähetä piti,Lasse Lehtinen,2025,,Ebook,
-35,Haltiain Verta,Andrzej Sapkowski,1994,,Ebook,
-36,East of Eden,John Steinbeck,1952,,Ebook,
-37,Halveksunnan aika,Andrzej Sapkowski,1995,,Ebook,
+book_id,title,author,publication_year,isbn,format,notes,language
+1,Spoon river anthology, Edgar Lee Masters,1915,,Physical,,English
+2,The great gatsby, F. Scott Fitzgerald,1925,,Physical,,English
+3,Vierastila,Miki Liukkonen,2023,,Physical,,Finnish
+4,Ensimmäinen persoona, Haruki Murakami,2020,,Physical,,Finnish
+5,Henkien talo, Isabel Allende,1982,,Physical,,Finnish
+6,Kafka Ranna, Haruki Murakami,2002,,Physical,,Finnish
+7,Olemisen sietämätön keveys, Milan Kundera,1984,,Physical,,Finnish
+8,Mies joka kuoli,Antti Tuomainen,2016,,Physical,,Finnish
+9,Elolliset,Iida Turpeinen,2023,,Physical,,Finnish
+10,Ikipuut,Richard Powers,2018,,Physical,,Finnish
+11,Bras Cubasin kuoleman jälkeiset muistelmat,Joaquim Maria Machado de Assis,1881,,Physical,,Finnish
+12,Kuin surmaisi satakielen,Harper Lee,1960,,Physical,,Finnish
+13,Vieterilintukronikka,Haruki Murakami,1995,,Physical,,Finnish
+14,CTRL + Alt Kaaos,Joe Tidy,2025,,Physical,,Finnish
+15,Vanhus ja meri,Ernest Hemingway,1952,,Physical,,Finnish
+16,Candide,Voltaire,1759,,Physical,,Finnish
+17,1984,George Orwell,1949,,Physical,,Finnish
+18,Norwegian Wood,Haruki Murakami,1987,,Physical,,Finnish
+19,Pintaremontti,Miika Nousiainen,2020,,Audiobook,,Finnish
+20,Orjattaresi,Margaret Atwood,1985,,Physical,,Finnish
+21,Jäähyväiset aseille,Ernest Hemingway,1929,,Physical,,Finnish
+22,Hiiriä ja ihmisiä,John Steinbeck,1937,,Physical,,Finnish
+23,Itselleni,Marcus Aurelius,,,Physical,Publication year unknown,Finnish
+24,Vihan hedelmät,John Steinbeck,1939,,Physical,,Finnish
+25,Kuolema iltapäivällä,Ernest Hemingway,1932,,Physical,,Finnish
+26,Humiseva Harju,Emily Bronte,1847,,Physical,,Finnish
+27,Dorian Grayn muotokuva,Oscar Wilde,1980,,Physical,,Finnish
+28,Project Hail Mary,Andy Weir,2021,,Physical,,English
+29,Kaikki isäni hotellit,John Irving,1981,,Physical,,Finnish
+30,Viimeinen toivomus,Andrzej Sapkowski,1993,,Ebook,,Finnish
+31,Saatana saapuu Moskovaan,Bulgakov,1967,,Ebook,,Finnish
+32,Kohtalon miekka,Andrzej Sapkowski,1992,,Ebook,,Finnish
+33,The Road,Cormac McCarthy,2006,,Ebook,,English
+34,Lähetä piti,Lasse Lehtinen,2025,,Ebook,,Finnish
+35,Haltiain Verta,Andrzej Sapkowski,1994,,Ebook,,Finnish
+36,East of Eden,John Steinbeck,1952,,Ebook,,English
+37,Halveksunnan aika,Andrzej Sapkowski,1995,,Ebook,,Finnish

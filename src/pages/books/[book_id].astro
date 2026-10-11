@@ -1,4 +1,5 @@
 ---
+import { validate } from 'astro:schema';
 import type { Book } from '../../data/reading-data';
 import { books, readingEvents } from '../../data/reading-data';
 
@@ -24,18 +25,46 @@ const history = readingEvents
 	.map(({ event }) => event);
 
 const metadata = [
-	{ label: 'Publication year', value: book.publication_year },
-	{ label: 'ISBN', value: book.isbn },
-	{ label: 'Format', value: book.format },
-	{ label: 'Notes', value: book.notes },
-].filter((item): item is { label: string; value: string } => Boolean(item.value));
+  { label: 'Publication year', value: book.publication_year },
+  { label: 'ISBN', value: book.isbn },
+  { label: 'Format', value: book.format },
+  { label: 'Notes', value: book.notes },
+  { label: 'Language', value: book.language },
+].filter(
+  (item): item is { label: string; value: string } =>
+    Boolean(item.value)
+);
 
 const statusLabels = {
-	read: 'Read',
-	reading: 'Reading',
-	abandoned: 'Abandoned',
+	read: 'Luettu',
+	reading: 'Kesken',
+	abandoned: 'Lopetettu',
 };
+
+const labelTranslation: Record<string, string> = {
+  'Publication year': 'Julkaisuvuosi',
+  Format: 'Formaatti',
+  Language: 'Kieli',
+  ISBN: 'ISBN',
+  Notes: 'Muistiinpanot',
+};
+
+const languageTranslation: Record<string, string> = {
+  English: 'englanti',
+  Finnish: 'suomi',
+};
+
+const bookformat: Record<string, string> = {
+  Ebook: 'E-kirja',
+  Physical: 'Fyysinen kirja',
+  Audiobook: 'Äänikirja',
+};
+console.log('Book object:', book);
+console.log('Language:', book.language);
+console.log('Metadata:', metadata);
 ---
+
+
 
 <!doctype html>
 <html lang="en">
@@ -51,35 +80,45 @@ const statusLabels = {
 	<body>
 		<main class="page-shell">
 			<header class="site-header">
-				<a class="wordmark" href="/">Reading Journal</a>
-				<a class="back-link" href="/books/">← Back to books</a>
+				<a class="wordmark" href="/">Lukupäiväkirja</a>
+				<a class="back-link" href="/books/">← Takaisin kaikkiin kirjoihin</a>
 			</header>
 
 			<article>
 				<section class="intro" aria-labelledby="page-title">
-					<p class="eyebrow">Book {book.book_id}</p>
+					<p class="eyebrow">Kirja numero {book.book_id}</p>
 					<h1 id="page-title">{book.title}</h1>
-					<p class="author">by {book.author}</p>
+					<p class="author">{book.author}</p>
 				</section>
 
 				{metadata.length > 0 && (
 					<section class="details-section" aria-labelledby="details-title">
-						<p class="eyebrow">The edition</p>
-						<h2 id="details-title">Book details</h2>
+						
+						<h2 id="details-title">Kirjan tiedot</h2>
 						<dl class="metadata-list">
-							{metadata.map((item) => (
-								<div class="metadata-row">
-									<dt>{item.label}</dt>
-									<dd>{item.value}</dd>
-								</div>
-							))}
+							{metadata.map((item) => {
+  							let value = item.value;
+
+							if (item.label === 'Language') {
+    						value = languageTranslation[value] ?? value;
+  							}
+
+  							if (item.label === 'Format') {
+    						value = bookformat[value] ?? value;
+  							}
+  							return (
+    						<div class="metadata-row">
+      						<dt>{labelTranslation[item.label] ?? item.label}</dt>
+      						<dd>{value}</dd>
+    					</div>
+  					);
+				})}
 						</dl>
 					</section>
 				)}
 
 				<section class="history-section" aria-labelledby="history-title">
-					<p class="eyebrow">The reading journal</p>
-					<h2 id="history-title">Reading history</h2>
+					<h2 id="history-title">Lukuhistoria</h2>
 					{history.length > 0 ? (
 						<ol class="history-list">
 							{history.map((event, index) => (
@@ -88,8 +127,8 @@ const statusLabels = {
 									<div class="event-details">
 										<h3>{statusLabels[event.status]}</h3>
 										<div class="event-dates">
-											{event.started_on && <p>Started <time datetime={event.started_on}>{event.started_on}</time></p>}
-											{event.finished_on && <p>Finished <time datetime={event.finished_on}>{event.finished_on}</time></p>}
+											{event.started_on && <p>Aloitettu <time datetime={event.started_on}>{event.started_on}</time></p>}
+											{event.finished_on && <p>Luettu <time datetime={event.finished_on}>{event.finished_on}</time></p>}
 											{!event.started_on && !event.finished_on && <p>No dates recorded</p>}
 										</div>
 									</div>
@@ -103,8 +142,8 @@ const statusLabels = {
 			</article>
 
 			<footer class="site-footer">
-				<p>Made for the love of a well-kept page.</p>
-				<a href="/books/">Return to books <span aria-hidden="true">→</span></a>
+				<p>Iikka Huttu</p>
+				<a href="/books/">Palaa kaikkiin kirjoihin <span aria-hidden="true">→</span></a>
 			</footer>
 		</main>
 	</body>

@@ -9,6 +9,7 @@ export type Book = {
 	isbn?: string;
 	format?: string;
 	notes?: string;
+	language?: string;
 };
 
 export type ReadingEvent = {
@@ -116,6 +117,7 @@ export const books: Book[] = bookRows.map(({ values, rowNumber }) => {
 		isbn: values.isbn || undefined,
 		format: values.format || undefined,
 		notes: values.notes || undefined,
+		language: values.language || undefined,
 	};
 });
 
