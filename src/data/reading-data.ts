@@ -5,6 +5,10 @@ export type Book = {
 	book_id: string;
 	title: string;
 	author: string;
+	publication_year?: string;
+	isbn?: string;
+	format?: string;
+	notes?: string;
 };
 
 export type ReadingEvent = {
@@ -108,6 +112,10 @@ export const books: Book[] = bookRows.map(({ values, rowNumber }) => {
 		book_id,
 		title: required(values, 'title', 'books.csv', rowNumber),
 		author: required(values, 'author', 'books.csv', rowNumber),
+		publication_year: values.publication_year || undefined,
+		isbn: values.isbn || undefined,
+		format: values.format || undefined,
+		notes: values.notes || undefined,
 	};
 });
 

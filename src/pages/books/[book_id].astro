@@ -1,0 +1,167 @@
+---
+import type { Book } from '../../data/reading-data';
+import { books, readingEvents } from '../../data/reading-data';
+
+export function getStaticPaths() {
+	return books.map((book) => ({
+		params: { book_id: book.book_id },
+		props: { book },
+	}));
+}
+
+const { book } = Astro.props as { book: Book };
+const history = readingEvents
+	.filter((event) => event.book_id === book.book_id)
+	.map((event, index) => ({ event, index }))
+	.sort((a, b) => {
+		const aDate = a.event.finished_on || a.event.started_on;
+		const bDate = b.event.finished_on || b.event.started_on;
+		if (aDate && bDate) return bDate.localeCompare(aDate);
+		if (aDate) return -1;
+		if (bDate) return 1;
+		return b.index - a.index;
+	})
+	.map(({ event }) => event);
+
+const metadata = [
+	{ label: 'Publication year', value: book.publication_year },
+	{ label: 'ISBN', value: book.isbn },
+	{ label: 'Format', value: book.format },
+	{ label: 'Notes', value: book.notes },
+].filter((item): item is { label: string; value: string } => Boolean(item.value));
+
+const statusLabels = {
+	read: 'Read',
+	reading: 'Reading',
+	abandoned: 'Abandoned',
+};
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={`${book.title} by ${book.author} in the Reading Journal.`} />
+		<title>{book.title} · Reading Journal</title>
+	</head>
+	<body>
+		<main class="page-shell">
+			<header class="site-header">
+				<a class="wordmark" href="/">Reading Journal</a>
+				<a class="back-link" href="/books/">← Back to books</a>
+			</header>
+
+			<article>
+				<section class="intro" aria-labelledby="page-title">
+					<p class="eyebrow">Book {book.book_id}</p>
+					<h1 id="page-title">{book.title}</h1>
+					<p class="author">by {book.author}</p>
+				</section>
+
+				{metadata.length > 0 && (
+					<section class="details-section" aria-labelledby="details-title">
+						<p class="eyebrow">The edition</p>
+						<h2 id="details-title">Book details</h2>
+						<dl class="metadata-list">
+							{metadata.map((item) => (
+								<div class="metadata-row">
+									<dt>{item.label}</dt>
+									<dd>{item.value}</dd>
+								</div>
+							))}
+						</dl>
+					</section>
+				)}
+
+				<section class="history-section" aria-labelledby="history-title">
+					<p class="eyebrow">The reading journal</p>
+					<h2 id="history-title">Reading history</h2>
+					{history.length > 0 ? (
+						<ol class="history-list">
+							{history.map((event, index) => (
+								<li class="history-row">
+									<span class="event-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+									<div class="event-details">
+										<h3>{statusLabels[event.status]}</h3>
+										<div class="event-dates">
+											{event.started_on && <p>Started <time datetime={event.started_on}>{event.started_on}</time></p>}
+											{event.finished_on && <p>Finished <time datetime={event.finished_on}>{event.finished_on}</time></p>}
+											{!event.started_on && !event.finished_on && <p>No dates recorded</p>}
+										</div>
+									</div>
+								</li>
+							))}
+						</ol>
+					) : (
+						<p class="empty-state">There are no reading events recorded for this book yet.</p>
+					)}
+				</section>
+			</article>
+
+			<footer class="site-footer">
+				<p>Made for the love of a well-kept page.</p>
+				<a href="/books/">Return to books <span aria-hidden="true">→</span></a>
+			</footer>
+		</main>
+	</body>
+</html>
+
+<style>
+	:global(*) { box-sizing: border-box; }
+	:global(html) {
+		background: #f5f3ec;
+		color: #262c25;
+		font-family: Georgia, 'Times New Roman', serif;
+		font-synthesis: none;
+		text-rendering: optimizeLegibility;
+		-webkit-font-smoothing: antialiased;
+	}
+	:global(body) { margin: 0; min-width: 320px; }
+	.page-shell { width: min(100% - 3rem, 900px); margin-inline: auto; }
+	.site-header, .site-footer { display: flex; align-items: center; justify-content: space-between; }
+	.site-header { min-height: 88px; border-bottom: 1px solid #d9ded3; }
+	.wordmark { color: #263c30; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.03em; text-decoration: none; }
+	.back-link, .site-footer a {
+		color: #47634d; font-family: Arial, sans-serif; font-size: 0.82rem; font-weight: 600;
+		text-underline-offset: 4px;
+	}
+	.intro { max-width: 760px; padding: clamp(4rem, 9vw, 7rem) 0 4rem; }
+	.eyebrow {
+		margin: 0 0 1rem; color: #58705a; font-family: Arial, sans-serif; font-size: 0.7rem;
+		font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+	}
+	h1 { margin: 0; font-size: clamp(2.8rem, 8vw, 6rem); font-weight: 400; letter-spacing: -0.06em; line-height: 1.02; }
+	.author { margin: 1.3rem 0 0; color: #62665e; font-size: clamp(1.15rem, 2.5vw, 1.4rem); }
+	.details-section, .history-section { padding: 2.5rem 0 3.5rem; border-top: 1px solid #d9ded3; }
+	h2 { margin: 0 0 1.5rem; font-size: clamp(1.7rem, 4vw, 2.3rem); font-weight: 400; letter-spacing: -0.04em; }
+	.metadata-list, .history-list { margin: 0; padding: 0; }
+	.metadata-row {
+		display: grid; grid-template-columns: minmax(9rem, 0.35fr) 1fr; gap: 1.5rem;
+		padding: 1rem 0; border-bottom: 1px solid #d9ded3;
+	}
+	.metadata-row dt { color: #74776f; font-family: Arial, sans-serif; font-size: 0.85rem; }
+	.metadata-row dd { margin: 0; overflow-wrap: anywhere; }
+	.history-list { list-style: none; }
+	.history-row {
+		display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 1rem;
+		padding: 1.25rem 0; border-bottom: 1px solid #d9ded3;
+	}
+	.event-number { padding-top: 0.2rem; color: #74816f; font-family: Arial, sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; }
+	.event-details h3 { margin: 0 0 0.55rem; font-size: 1.2rem; font-weight: 400; }
+	.event-dates { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+	.event-dates p { margin: 0; color: #74776f; font-family: Arial, sans-serif; font-size: 0.85rem; }
+	time { color: #41473f; }
+	.empty-state { color: #62665e; font-size: 1.05rem; line-height: 1.7; }
+	.site-footer { min-height: 76px; gap: 1rem; border-top: 1px solid #d9ded3; color: #77796f; font-family: Arial, sans-serif; font-size: 0.78rem; }
+	.site-footer p { margin: 0; }
+	@media (max-width: 600px) {
+		.page-shell { width: min(100% - 2rem, 520px); }
+		.site-header { min-height: 72px; }
+		.metadata-row { grid-template-columns: 1fr; gap: 0.45rem; }
+		.history-row { grid-template-columns: 2rem minmax(0, 1fr); gap: 0.7rem; }
+	}
+</style>
