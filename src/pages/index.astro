@@ -1,9 +1,21 @@
 ---
-const recentlyRead = [
-	{ title: 'The Cartographer’s Orchard', author: 'Mara Ellery' },
-	{ title: 'A House of Quiet Rain', author: 'Jonah Vale' },
-	{ title: 'The Last Lightkeeper', author: 'S. Rowan' },
-];
+import { books, readingEvents } from '../data/reading-data';
+
+const booksById = new Map(books.map((book) => [book.book_id, book]));
+const recentlyRead = readingEvents
+	.filter((event) => event.status === 'read')
+	.map((event, index) => ({ event, index }))
+	.sort((a, b) => {
+		if (a.event.finished_on && b.event.finished_on) {
+			return b.event.finished_on.localeCompare(a.event.finished_on);
+		}
+		if (a.event.finished_on) return -1;
+		if (b.event.finished_on) return 1;
+		// Without dates, use the CSV's order, with later rows treated as more recent.
+		return b.index - a.index;
+	})
+	.slice(0, 3)
+	.map(({ event }) => booksById.get(event.book_id)!);
 ---
 
 <!doctype html>
@@ -50,6 +62,9 @@ const recentlyRead = [
 						</li>
 					))}
 				</ol>
+				{recentlyRead.length === 0 && (
+					<p class="empty-state">Your recently finished books will appear here once you add them to the reading list.</p>
+				)}
 			</section>
 
 			<footer class="site-footer">

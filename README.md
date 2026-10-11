@@ -41,3 +41,14 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Notes on data structure
+
+books.csv
+"format" is either "Physical", "Ebook" & "Audiobook"
+"publication_year" refers to the original publishing year, if this in unknown, leave it empty. 
+
+
+reading_events.csv
+
+"status" is eitehr "Reading", "Read" or "Abadoned" 

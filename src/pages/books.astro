@@ -1,0 +1,244 @@
+W---
+import { books, readingEvents } from '../data/reading-data';
+
+const booksById = new Map(books.map((book) => [book.book_id, book]));
+const recentBooks = readingEvents
+	.filter((event) => event.status === 'read')
+	.map((event, index) => ({ event, index }))
+	.sort((a, b) => {
+		if (a.event.finished_on && b.event.finished_on) {
+			return b.event.finished_on.localeCompare(a.event.finished_on);
+		}
+		if (a.event.finished_on) return -1;
+		if (b.event.finished_on) return 1;
+		return b.index - a.index;
+	})
+	.map(({ event }) => ({ book: booksById.get(event.book_id)!, event }));
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Books in my personal reading journal." />
+		<title>Recently read · Reading Journal</title>
+	</head>
+	<body>
+		<main class="page-shell">
+			<header class="site-header">
+				<a class="wordmark" href="/">Reading Journal</a>
+				<a class="back-link" href="/">Back to home <span aria-hidden="true">←</span></a>
+			</header>
+
+			<section class="intro" aria-labelledby="page-title">
+				<p class="eyebrow">A shelf of stories</p>
+				<h1 id="page-title">Recently read</h1>
+				<p class="intro-copy">A record of the books I’ve finished, in reading order.</p>
+			</section>
+
+			<section class="book-section" aria-label="Recently read books">
+				{recentBooks.length > 0 ? (
+					<ol class="book-list">
+						{recentBooks.map(({ book, event }, index) => (
+							<li class="book-row">
+								<span class="book-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+								<div class="book-details">
+									<h2>{book.title}</h2>
+									<p>{book.author}</p>
+								</div>
+								{event.finished_on && <time datetime={event.finished_on}>{event.finished_on}</time>}
+							</li>
+						))}
+					</ol>
+				) : (
+					<p class="empty-state">Finished books will appear here once you add reading events with the status “read”.</p>
+				)}
+			</section>
+
+			<footer class="site-footer">
+				<p>Made for the love of a well-kept page.</p>
+				<a href="/">Return home <span aria-hidden="true">→</span></a>
+			</footer>
+		</main>
+	</body>
+</html>
+
+<style>
+	:global(*) {
+		box-sizing: border-box;
+	}
+
+	:global(html) {
+		background: #f5f3ec;
+		color: #262c25;
+		font-family: Georgia, 'Times New Roman', serif;
+		font-synthesis: none;
+		text-rendering: optimizeLegibility;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	:global(body) {
+		margin: 0;
+		min-width: 320px;
+	}
+
+	.page-shell {
+		width: min(100% - 3rem, 1080px);
+		margin-inline: auto;
+	}
+
+	.site-header,
+	.site-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.site-header {
+		min-height: 88px;
+		border-bottom: 1px solid #d9ded3;
+	}
+
+	.wordmark {
+		color: #263c30;
+		font-size: 1.05rem;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		text-decoration: none;
+	}
+
+	.back-link,
+	.site-footer a {
+		color: #47634d;
+		font-family: Arial, sans-serif;
+		font-size: 0.82rem;
+		font-weight: 600;
+		text-underline-offset: 4px;
+	}
+
+	.back-link span,
+	.site-footer a span {
+		padding-left: 0.3rem;
+	}
+
+	.intro {
+		max-width: 720px;
+		padding: clamp(4rem, 9vw, 7rem) 0 3.5rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 1.1rem;
+		color: #58705a;
+		font-family: Arial, sans-serif;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: clamp(2.8rem, 7vw, 5.5rem);
+		font-weight: 400;
+		letter-spacing: -0.06em;
+		line-height: 1;
+	}
+
+	.intro-copy {
+		margin: 1.4rem 0 0;
+		color: #62665e;
+		font-size: 1.1rem;
+		line-height: 1.7;
+	}
+
+	.book-section {
+		padding: 2rem 0 5rem;
+		border-top: 1px solid #d9ded3;
+	}
+
+	.book-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.book-row {
+		display: grid;
+		grid-template-columns: 3rem minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 1rem;
+		min-height: 108px;
+		border-bottom: 1px solid #d9ded3;
+	}
+
+	.book-number {
+		color: #74816f;
+		font-family: Arial, sans-serif;
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+	}
+
+	.book-details h2 {
+		margin: 0 0 0.4rem;
+		font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+		font-weight: 400;
+		letter-spacing: -0.025em;
+	}
+
+	.book-details p {
+		margin: 0;
+		color: #74776f;
+		font-family: Arial, sans-serif;
+		font-size: 0.85rem;
+	}
+
+	time {
+		color: #74776f;
+		font-family: Arial, sans-serif;
+		font-size: 0.78rem;
+		white-space: nowrap;
+	}
+
+	.empty-state {
+		color: #62665e;
+		font-size: 1.05rem;
+		line-height: 1.7;
+	}
+
+	.site-footer {
+		min-height: 76px;
+		gap: 1rem;
+		border-top: 1px solid #d9ded3;
+		color: #77796f;
+		font-family: Arial, sans-serif;
+		font-size: 0.78rem;
+	}
+
+	.site-footer p {
+		margin: 0;
+	}
+
+	@media (max-width: 600px) {
+		.page-shell {
+			width: min(100% - 2rem, 520px);
+		}
+
+		.site-header {
+			min-height: 72px;
+		}
+
+		.book-row {
+			grid-template-columns: 2rem minmax(0, 1fr);
+			gap: 0.7rem;
+			padding-block: 1rem;
+		}
+
+		time {
+			grid-column: 2;
+		}
+	}
+</style>
