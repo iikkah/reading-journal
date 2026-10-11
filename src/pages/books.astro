@@ -1,6 +1,7 @@
 ---
 import { books, readingEvents } from '../data/reading-data';
 import { getRatingForBook } from '../data/reviews';
+import { withBase } from '../utils/urls';
 
 const latestEventByBook = new Map<string, (typeof readingEvents)[number]>();
 for (const event of readingEvents) {
@@ -28,8 +29,8 @@ const catalogue = [...books].sort((a, b) => {
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<link rel="icon" href={withBase('favicon.ico')} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Books in my personal reading journal." />
@@ -38,8 +39,8 @@ const catalogue = [...books].sort((a, b) => {
 	<body>
 		<main class="page-shell">
 			<header class="site-header">
-				<a class="wordmark" href="/">Lukupäiväkirja</a>
-				<a class="back-link" href="/">Takaisin etusivulle <span aria-hidden="true">←</span></a>
+				<a class="wordmark" href={withBase('')}>Lukupäiväkirja</a>
+				<a class="back-link" href={withBase('')}>Takaisin etusivulle <span aria-hidden="true">←</span></a>
 			</header>
 
 			<section class="intro" aria-labelledby="page-title">
@@ -59,7 +60,7 @@ const catalogue = [...books].sort((a, b) => {
 								<li class="book-row">
 									<span class="book-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
 									<div class="book-details">
-										<h2><a href={`/books/${book.book_id}/`}>{book.title}</a></h2>
+										<h2><a href={withBase(`books/${book.book_id}/`)}>{book.title}</a></h2>
 										<p>
 											{book.author}
 											{rating !== undefined && <span class="book-rating" aria-label={`Rating: ${rating} out of 5`}> · {rating}/5</span>}
@@ -77,7 +78,7 @@ const catalogue = [...books].sort((a, b) => {
 
 			<footer class="site-footer">
 				<p>Iikka Huttu</p>
-				<a href="/">Takaisin etusivulle <span aria-hidden="true">→</span></a>
+				<a href={withBase('')}>Takaisin etusivulle <span aria-hidden="true">→</span></a>
 			</footer>
 		</main>
 	</body>

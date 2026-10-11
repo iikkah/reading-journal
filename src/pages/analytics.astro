@@ -1,5 +1,6 @@
 ---
 import { analyticsDataset, analyticsFilterOptions } from '../data/analytics';
+import { withBase } from '../utils/urls';
 
 const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g, '\\u003c');
 ---
@@ -8,8 +9,8 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<link rel="icon" href={withBase('favicon.ico')} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Explore reading activity and ratings in the Reading Journal." />
@@ -19,10 +20,10 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 		<div id="analytics-data" data-payload={analyticsJson} hidden></div>
 		<main class="page-shell">
 			<header class="site-header">
-				<a class="wordmark" href="/">Lukupäiväkirja</a>
+				<a class="wordmark" href={withBase('')}>Lukupäiväkirja</a>
 				<nav aria-label="Main navigation">
-					<a href="/books/">Kirjat</a>
-					<a href="/">Etusivu</a>
+					<a href={withBase('books/')}>Kirjat</a>
+					<a href={withBase('')}>Etusivu</a>
 				</nav>
 			</header>
 
@@ -92,7 +93,7 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 
 			<footer class="site-footer">
 				<p>Iikka Huttu</p>
-				<a href="/books/">Palaa kirjoihin <span aria-hidden="true">→</span></a>
+				<a href={withBase('books/')}>Palaa kirjoihin <span aria-hidden="true">→</span></a>
 			</footer>
 		</main>
 	</body>

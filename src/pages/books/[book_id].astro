@@ -2,6 +2,7 @@
 import type { Book } from '../../data/reading-data';
 import { books, readingEvents } from '../../data/reading-data';
 import { getReviewForBook } from '../../data/reviews';
+import { withBase } from '../../utils/urls';
 
 export function getStaticPaths() {
 	return books.map((book) => ({
@@ -72,8 +73,8 @@ const bookformat: Record<string, string> = {
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<link rel="icon" href={withBase('favicon.ico')} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={`${book.title} by ${book.author} in the Reading Journal.`} />
@@ -82,8 +83,8 @@ const bookformat: Record<string, string> = {
 	<body>
 		<main class="page-shell">
 			<header class="site-header">
-				<a class="wordmark" href="/">Lukupäiväkirja</a>
-				<a class="back-link" href="/books/">← Takaisin kaikkiin kirjoihin</a>
+				<a class="wordmark" href={withBase('')}>Lukupäiväkirja</a>
+				<a class="back-link" href={withBase('books/')}>← Takaisin kaikkiin kirjoihin</a>
 			</header>
 
 			<article>
@@ -156,7 +157,7 @@ const bookformat: Record<string, string> = {
 
 			<footer class="site-footer">
 				<p>Iikka Huttu</p>
-				<a href="/books/">Palaa kaikkiin kirjoihin <span aria-hidden="true">→</span></a>
+				<a href={withBase('books/')}>Palaa kaikkiin kirjoihin <span aria-hidden="true">→</span></a>
 			</footer>
 		</main>
 	</body>

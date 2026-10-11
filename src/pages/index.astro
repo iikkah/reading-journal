@@ -1,6 +1,7 @@
 ---
 import { books, readingEvents } from '../data/reading-data';
 import { getRatingForBook } from '../data/reviews';
+import { withBase } from '../utils/urls';
 
 
 
@@ -25,8 +26,8 @@ const recentlyRead = readingEvents
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<link rel="icon" href={withBase('favicon.ico')} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="A personal record of books read and remembered." />
@@ -36,7 +37,7 @@ const recentlyRead = readingEvents
 	<body>
 		<main class="page-shell">
 			<header class="site-header">
-				<a class="wordmark" href="/" aria-label="Reading Journal home">Lukupäiväkirja</a>
+				<a class="wordmark" href={withBase('')} aria-label="Reading Journal home">Lukupäiväkirja</a>
 				
 			</header>
 			<section class="intro" aria-labelledby="page-title">
@@ -58,7 +59,7 @@ const recentlyRead = readingEvents
 						<li class="book-card">
 							<span class="book-number" aria-hidden="true">0{index + 1}</span>
 							<div>
-								<h3><a href={`/books/${book.book_id}/`}>{book.title}</a></h3>
+								<h3><a href={withBase(`books/${book.book_id}/`)}>{book.title}</a></h3>
 								<p>{book.author}</p>
 								{getRatingForBook(book.book_id) !== undefined && <span class="book-rating" aria-label={`Rating: ${getRatingForBook(book.book_id)} out of 5`}> Arvosana: {getRatingForBook(book.book_id)}/5</span>}
 							</div>
@@ -75,7 +76,7 @@ const recentlyRead = readingEvents
 
 			<footer class="site-footer">
 				<p>Iikka Huttu</p>
-				<a href="/books/">Kaikki kirjat <span aria-hidden="true">→</span></a>
+				<a href={withBase('books/')}>Kaikki kirjat <span aria-hidden="true">→</span></a>
 			</footer>
 		</main>
 	</body>
