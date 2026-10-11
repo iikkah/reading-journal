@@ -1,5 +1,7 @@
 ---
 import { books, readingEvents } from '../data/reading-data';
+import { getRatingForBook } from '../data/reviews';
+
 
 
 const booksById = new Map(books.map((book) => [book.book_id, book]));
@@ -39,7 +41,7 @@ const recentlyRead = readingEvents
 			</header>
 			<section class="intro" aria-labelledby="page-title">
 				<p class="eyebrow">Ennen kaikkea omaksi ilokseni</p>
-				<h1 id="page-title">Kirjallisuus, <em>horinaa.</em></h1>
+				<h1 id="page-title">Kirjallisuutta ja <em>horinaa.</em></h1>
 				<p class="intro-copy">
 					Minun henkilökohtainen lukupäiväkirjani, jossa pidän lukua lukemistani kirjoista sekä pieniä havaintoja tai arvosteluja silloin kun sellaisia jaksan kirjoitella.
 				</p>
@@ -51,13 +53,17 @@ const recentlyRead = readingEvents
 					<h2 id="recent-title">Viimeisimpänä luetut</h2>
 				</div>
 				<ol class="book-list">
+					
 					{recentlyRead.map((book, index) => (
 						<li class="book-card">
 							<span class="book-number" aria-hidden="true">0{index + 1}</span>
 							<div>
 								<h3><a href={`/books/${book.book_id}/`}>{book.title}</a></h3>
 								<p>{book.author}</p>
+								{getRatingForBook(book.book_id) !== undefined && <span class="book-rating" aria-label={`Rating: ${getRatingForBook(book.book_id)} out of 5`}> Arvosana: {getRatingForBook(book.book_id)}/5</span>}
 							</div>
+							
+							
 							<span class="book-mark" aria-hidden="true">✳</span>
 						</li>
 					))}
