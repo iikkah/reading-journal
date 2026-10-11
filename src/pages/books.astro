@@ -58,7 +58,7 @@ const catalogue = [...books].sort((a, b) => {
 							const rating = getRatingForBook(book.book_id);
 							return (
 								<li class="book-row">
-									<span class="book-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+									<span class="book-number" aria-hidden="true">{String(index + 1)}</span>
 									<div class="book-details">
 										<h2><a href={withBase(`books/${book.book_id}/`)}>{book.title}</a></h2>
 										<p>
