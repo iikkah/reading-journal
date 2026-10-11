@@ -1,5 +1,6 @@
 ---
 import { books, readingEvents } from '../data/reading-data';
+import { getRatingForBook } from '../data/reviews';
 
 const latestEventByBook = new Map<string, (typeof readingEvents)[number]>();
 for (const event of readingEvents) {
@@ -53,12 +54,16 @@ const catalogue = [...books].sort((a, b) => {
 						{catalogue.map((book, index) => {
 							const latestEvent = latestEventByBook.get(book.book_id);
 							const date = latestEvent?.finished_on || latestEvent?.started_on;
+							const rating = getRatingForBook(book.book_id);
 							return (
 								<li class="book-row">
 									<span class="book-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
 									<div class="book-details">
 										<h2><a href={`/books/${book.book_id}/`}>{book.title}</a></h2>
-										<p>{book.author}</p>
+										<p>
+											{book.author}
+											{rating !== undefined && <span class="book-rating" aria-label={`Rating: ${rating} out of 5`}> · {rating}/5</span>}
+										</p>
 									</div>
 									{date && <time datetime={date}>{date}</time>}
 								</li>
@@ -116,6 +121,7 @@ const catalogue = [...books].sort((a, b) => {
 	.book-details h2 a { color: inherit; text-decoration-color: #a6b1a2; text-underline-offset: 4px; }
 	.book-details h2 a:hover { color: #47634d; }
 	.book-details p { margin: 0; color: #74776f; font-family: Arial, sans-serif; font-size: 0.85rem; }
+	.book-rating { color: #47634d; font-weight: 600; white-space: nowrap; }
 	time { color: #74776f; font-family: Arial, sans-serif; font-size: 0.78rem; white-space: nowrap; }
 	.empty-state { color: #62665e; font-size: 1.05rem; line-height: 1.7; }
 	.site-footer { min-height: 76px; gap: 1rem; border-top: 1px solid #d9ded3; color: #77796f; font-family: Arial, sans-serif; font-size: 0.78rem; }
