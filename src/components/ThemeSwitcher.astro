@@ -1,0 +1,44 @@
+---
+const showSwitcher = import.meta.env.DEV;
+---
+
+{showSwitcher && (
+	<div class="theme-switcher">
+		<label for="theme-select">Theme</label>
+		<select id="theme-select">
+			<option value="editorial">Editorial / Literary</option>
+			<option value="dashboard">Data Dashboard</option>
+			<option value="minimalist">Minimalist</option>
+		</select>
+	</div>
+)}
+
+<script>
+	const themeSelect = document.querySelector<HTMLSelectElement>('#theme-select');
+	const themes = ['editorial', 'dashboard', 'minimalist'];
+	const storageKey = 'reading-journal-theme';
+
+	function applyTheme(theme: string): void {
+		if (!themes.includes(theme)) return;
+		document.documentElement.dataset.theme = theme;
+		try {
+			localStorage.setItem(storageKey, theme);
+		} catch {
+			// The theme still works for this page if browser storage is unavailable.
+		}
+		document.dispatchEvent(new CustomEvent('reading-journal-theme-change'));
+	}
+
+	if (themeSelect) {
+		let savedTheme = 'editorial';
+		try {
+			savedTheme = localStorage.getItem(storageKey) ?? savedTheme;
+		} catch {
+			// Keep the default theme when browser storage is unavailable.
+		}
+		if (!themes.includes(savedTheme)) savedTheme = 'editorial';
+		document.documentElement.dataset.theme = savedTheme;
+		themeSelect.value = savedTheme;
+		themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+	}
+</script>

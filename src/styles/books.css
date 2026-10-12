@@ -1,0 +1,30 @@
+
+	.back-link span, .site-footer a span { padding-left: 0.3rem; }
+	.intro { max-width: 720px; padding: clamp(4rem, 9vw, 7rem) 0 3.5rem; }
+	.eyebrow {
+		margin: 0 0 1.1rem; color: var(--color-accent-soft); font-family: var(--font-ui); font-size: 0.7rem;
+		font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+	}
+	h1 { margin: 0; font-size: clamp(2.8rem, 7vw, 5.5rem); font-weight: 400; letter-spacing: -0.06em; line-height: 1; }
+	.intro-copy { margin: 1.4rem 0 0; color: var(--color-muted); font-size: 1.1rem; line-height: 1.7; }
+	.book-section { padding: var(--section-space) 0; border-top: 1px solid var(--color-border); }
+	.section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+	.section-heading h2 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.3rem); font-weight: 400; letter-spacing: -0.04em; }
+	.section-heading span { color: var(--color-accent-muted); font-family: var(--font-ui); font-size: 0.8rem; }
+	.book-list { margin: 0; padding: 0; list-style: none; }
+	.book-row {
+		display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; align-items: center; gap: 1rem;
+		min-height: 108px; border-bottom: 1px solid var(--color-border);
+	}
+	.book-number { color: var(--color-accent-muted); font-family: var(--font-ui); font-size: 0.72rem; letter-spacing: 0.08em; }
+	.book-details h2 { margin: 0 0 0.4rem; font-size: clamp(1.2rem, 2.4vw, 1.65rem); font-weight: 400; letter-spacing: -0.025em; }
+	.book-details h2 a { color: inherit; text-decoration-color: var(--color-link-underline); text-underline-offset: 4px; }
+	.book-details h2 a:hover { color: var(--color-accent); }
+	.book-details p { margin: 0; color: var(--color-subtle); font-family: var(--font-ui); font-size: 0.85rem; }
+	.book-rating { color: var(--color-accent); font-weight: 600; white-space: nowrap; }
+	time { color: var(--color-subtle); font-family: var(--font-ui); font-size: 0.78rem; white-space: nowrap; }
+	.empty-state { color: var(--color-muted); font-size: 1.05rem; line-height: 1.7; }
+	@media (max-width: 600px) {
+		.book-row { grid-template-columns: 2rem minmax(0, 1fr); gap: 0.7rem; padding-block: 1rem; }
+		time { grid-column: 2; }
+	}

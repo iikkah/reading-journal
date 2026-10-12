@@ -30,8 +30,9 @@ const chartDefinitions: ChartDefinition[] = [
 ];
 
 const charts = new Map<string, Chart>();
-Chart.defaults.color = '#62665e';
-Chart.defaults.font.family = 'Arial, sans-serif';
+const themeToken = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+Chart.defaults.color = themeToken('--color-muted');
+Chart.defaults.font.family = themeToken('--font-ui');
 
 for (const definition of chartDefinitions) {
 	const canvas = document.getElementById(definition.canvasId) as HTMLCanvasElement | null;
@@ -44,8 +45,8 @@ for (const definition of chartDefinitions) {
 			datasets: [{
 				label: definition.label,
 				data: [],
-				backgroundColor: '#789078',
-				hoverBackgroundColor: '#47634d',
+					backgroundColor: themeToken('--color-accent-muted'),
+					hoverBackgroundColor: themeToken('--color-accent'),
 				borderRadius: 4,
 				maxBarThickness: 34,
 			}],
@@ -72,9 +73,9 @@ for (const definition of chartDefinitions) {
 				const label = activeChart.data.labels?.[point.index];
 				if (label === undefined) return;
 				const select = document.getElementById(`filter-${definition.filter}`) as HTMLSelectElement | null;
-			const filterValue = definition.canvasId === 'chart-year' ? String(label).slice(0, 4) : String(label);
-			if (select && [...select.options].some((option) => option.value === filterValue)) {
-				select.value = filterValue;
+				const filterValue = definition.canvasId === 'chart-year' ? String(label).slice(0, 4) : String(label);
+				if (select && [...select.options].some((option) => option.value === filterValue)) {
+					select.value = filterValue;
 					select.dispatchEvent(new Event('change'));
 				}
 			},
@@ -82,6 +83,25 @@ for (const definition of chartDefinitions) {
 	});
 	charts.set(definition.canvasId, chart);
 }
+
+function updateChartTheme(): void {
+	Chart.defaults.color = themeToken('--color-muted');
+	Chart.defaults.font.family = themeToken('--font-ui');
+	for (const chart of charts.values()) {
+		chart.data.datasets[0].backgroundColor = themeToken('--color-accent-muted');
+		chart.data.datasets[0].hoverBackgroundColor = themeToken('--color-accent');
+		for (const axis of [chart.options.scales?.x, chart.options.scales?.y]) {
+			if (axis) {
+				axis.ticks = { ...axis.ticks, color: themeToken('--color-muted') };
+				axis.grid = { ...axis.grid, color: themeToken('--color-border') };
+			}
+		}
+		chart.update();
+	}
+}
+
+document.addEventListener('reading-journal-theme-change', updateChartTheme);
+updateChartTheme();
 
 const numberFormat = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
 
