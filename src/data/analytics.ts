@@ -1,5 +1,5 @@
 import { books, readingEvents } from './reading-data';
-import { getRatingForBook } from './reviews';
+import { getRatingForBook, getReviewForBook } from './reviews';
 
 export type AnalyticsBook = {
 	bookId: string;
@@ -8,7 +8,12 @@ export type AnalyticsBook = {
 	language: string;
 	format: string;
 	rating?: number;
-	currentlyReading: boolean;
+	status?: 'read' | 'reading' | 'abandoned';
+	startedOn?: string;
+	finishedOn?: string;
+	readingDays?: number;
+	readingEventCount: number;
+	hasNotesOrReview: boolean;
 };
 
 export type AnalyticsEvent = {
@@ -29,6 +34,24 @@ export type AnalyticsDataset = {
 };
 
 const bookById = new Map(books.map((book) => [book.book_id, book]));
+
+const latestEventByBook = new Map<string, (typeof readingEvents)[number]>();
+for (const event of readingEvents) {
+	const current = latestEventByBook.get(event.book_id);
+	const eventDate = event.finished_on || event.started_on;
+	const currentDate = current?.finished_on || current?.started_on || '';
+	if (!current || eventDate > currentDate || (!eventDate && !currentDate)) {
+		latestEventByBook.set(event.book_id, event);
+	}
+}
+
+function elapsedCalendarDays(startedOn: string, finishedOn: string): number | undefined {
+	if (!startedOn || !finishedOn) return undefined;
+	const start = Date.parse(`${startedOn}T00:00:00Z`);
+	const finish = Date.parse(`${finishedOn}T00:00:00Z`);
+	if (!Number.isFinite(start) || !Number.isFinite(finish) || finish < start) return undefined;
+	return Math.round((finish - start) / 86_400_000);
+}
 
 const events: AnalyticsEvent[] = readingEvents.map((event) => {
 	const book = bookById.get(event.book_id);
@@ -55,7 +78,15 @@ export const analyticsDataset: AnalyticsDataset = {
 		language: book.language || 'Unknown',
 		format: book.format || 'Unknown',
 		rating: getRatingForBook(book.book_id),
-		currentlyReading: events.some((event) => event.bookId === book.book_id && event.status === 'reading'),
+		status: latestEventByBook.get(book.book_id)?.status,
+		startedOn: latestEventByBook.get(book.book_id)?.started_on || undefined,
+		finishedOn: latestEventByBook.get(book.book_id)?.finished_on || undefined,
+		readingDays: (() => {
+			const event = latestEventByBook.get(book.book_id);
+			return event ? elapsedCalendarDays(event.started_on, event.finished_on) : undefined;
+		})(),
+		readingEventCount: events.filter((event) => event.bookId === book.book_id).length,
+		hasNotesOrReview: Boolean(book.notes || getReviewForBook(book.book_id)),
 	})),
 	events,
 };

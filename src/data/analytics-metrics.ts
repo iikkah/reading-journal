@@ -12,10 +12,13 @@ export type CountChart = { labels: string[]; values: number[] };
 
 export type AnalyticsResult = {
 	totalBooks: number;
+	completedBooks: number;
 	completedEvents: number;
 	currentlyReadingBooks: number;
 	averageRating: number | null;
+	averageReadingDays: number | null;
 	completedByYear: CountChart;
+	completedByMonth: CountChart;
 	ratings: CountChart;
 	byLanguage: CountChart;
 	byFormat: CountChart;
@@ -44,10 +47,27 @@ export function calculateAnalytics(dataset: AnalyticsDataset, filters: Analytics
 		selectedBookIds.has(event.bookId) && (!filters.year || event.completedYear === filters.year),
 	);
 	const completedEvents = selectedEvents.filter((event) => event.status === 'read');
+	const latestEventByBook = new Map<string, (typeof dataset.events)[number]>();
+	for (const event of dataset.events) {
+		const current = latestEventByBook.get(event.bookId);
+		const eventDate = event.finishedOn || event.startedOn;
+		const currentDate = current?.finishedOn || current?.startedOn || '';
+		if (!current || eventDate > currentDate || (!eventDate && !currentDate)) latestEventByBook.set(event.bookId, event);
+	}
+	const currentlyReadingIds = new Set(
+		[...latestEventByBook].filter(([, event]) => event.status === 'reading').map(([bookId]) => bookId),
+	);
 	const ratedBooks = selectedBooks.filter((book) => book.rating !== undefined);
 	const averageRating = ratedBooks.length
 		? ratedBooks.reduce((total, book) => total + book.rating!, 0) / ratedBooks.length
 		: null;
+	const readingDurations = completedEvents.flatMap((event) => {
+		if (!event.startedOn || !event.finishedOn) return [];
+		const start = Date.parse(`${event.startedOn}T00:00:00Z`);
+		const finish = Date.parse(`${event.finishedOn}T00:00:00Z`);
+		if (!Number.isFinite(start) || !Number.isFinite(finish) || finish < start) return [];
+		return [Math.round((finish - start) / 86_400_000)];
+	});
 
 	const ratingCounts = new Map<number, number>([1, 2, 3, 4, 5].map((rating) => [rating, 0]));
 	for (const book of selectedBooks) {
@@ -55,15 +75,26 @@ export function calculateAnalytics(dataset: AnalyticsDataset, filters: Analytics
 	}
 
 	const yearCounts = countBy(completedEvents.flatMap((event) => event.completedYear ? [event.completedYear] : []));
+	const monthCounts = countBy(completedEvents.flatMap((event) => event.finishedOn ? [event.finishedOn.slice(0, 7)] : []));
+	const monthLabels = [...monthCounts.labels].sort();
+	const completedByMonth = {
+		labels: monthLabels,
+		values: monthLabels.map((month) => monthCounts.values[monthCounts.labels.indexOf(month)]),
+	};
 	const authorCounts = countBy(completedEvents.map((event) => event.author));
 	const topAuthors = { labels: authorCounts.labels.slice(0, 10), values: authorCounts.values.slice(0, 10) };
 
 	return {
 		totalBooks: selectedBooks.length,
+		completedBooks: new Set(completedEvents.map((event) => event.bookId)).size,
 		completedEvents: completedEvents.length,
-		currentlyReadingBooks: selectedBooks.filter((book) => book.currentlyReading).length,
+		currentlyReadingBooks: selectedBooks.filter((book) => currentlyReadingIds.has(book.bookId)).length,
 		averageRating,
+		averageReadingDays: readingDurations.length
+			? readingDurations.reduce((total, duration) => total + duration, 0) / readingDurations.length
+			: null,
 		completedByYear: yearCounts,
+		completedByMonth,
 		ratings: {
 			labels: [1, 2, 3, 4, 5].map(String),
 			values: [1, 2, 3, 4, 5].map((rating) => ratingCounts.get(rating) ?? 0),

@@ -3,6 +3,7 @@ import { analyticsDataset, analyticsFilterOptions } from '../data/analytics';
 import { withBase } from '../utils/urls';
 
 const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g, '\\u003c');
+const statusLabels = { read: 'Finished', reading: 'Currently reading', abandoned: 'Abandoned' };
 ---
 
 <!doctype html>
@@ -63,14 +64,16 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 
 			<section class="kpi-grid" aria-label="Reading key performance indicators">
 				<article class="kpi-card"><p>Kirjoja valinnassa</p><strong id="kpi-books">—</strong><small>Yksittäisiä kirjoja katalogista</small></article>
-				<article class="kpi-card"><p>Valmiita lukukertoja</p><strong id="kpi-completed">—</strong><small>Jokainen lukukerta lasketaan erikseen</small></article>
+				<article class="kpi-card"><p>Luettuja kirjoja</p><strong id="kpi-completed-books">—</strong><small>Yksittäiset kirjat, jotka on luettu vähintään kerran</small></article>
+				<article class="kpi-card"><p>Valmiita lukukertoja</p><strong id="kpi-completed">—</strong><small>Jokainen valmis lukukerta lasketaan erikseen</small></article>
 				<article class="kpi-card"><p>Kesken</p><strong id="kpi-reading">—</strong><small>Yksittäisiä kirjoja, joilla aktiivinen lukukerta</small></article>
 				<article class="kpi-card"><p>Keskiarvo</p><strong id="kpi-rating">—</strong><small>Kirjakohtaisten arvosanojen keskiarvo</small></article>
+				<article class="kpi-card"><p>Lukuaika keskimäärin</p><strong id="kpi-duration">—</strong><small>Päivää / valmis lukukerta, kun molemmat päivät ovat tiedossa</small></article>
 			</section>
 
 			<section class="chart-grid" aria-label="Reading charts">
 				<article class="chart-panel">
-					<div class="chart-heading"><div><p class="eyebrow">Ajan myötä</p><h2>Valmiit lukukerrat</h2></div><span>lukukertoja / vuosi</span></div>
+					<div class="chart-heading"><div><p class="eyebrow">Ajan myötä</p><h2>Valmiit lukukerrat</h2></div><span>lukukertoja / kuukausi</span></div>
 					<div class="chart-frame"><canvas id="chart-year" role="img" aria-label="Valmiit lukukerrat valmistumisvuoden mukaan"></canvas><p id="empty-year" class="chart-empty" hidden>Ei valmistumispäivällisiä lukukertoja valituilla suodattimilla.</p></div>
 				</article>
 				<article class="chart-panel">
@@ -89,6 +92,40 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 					<div class="chart-heading"><div><p class="eyebrow">Lukukerrat</p><h2>Useimmin luetut kirjailijat</h2></div><span>valmiita lukukertoja</span></div>
 					<div class="chart-frame chart-frame-authors"><canvas id="chart-authors" role="img" aria-label="Kymmenen eniten luettua kirjailijaa valmiiden lukukertojen perusteella"></canvas><p id="empty-authors" class="chart-empty" hidden>Ei valmiita lukukertoja valituilla suodattimilla.</p></div>
 				</article>
+			</section>
+
+			<section class="book-analysis" aria-labelledby="book-analysis-title">
+				<div class="analysis-heading">
+					<div><p class="eyebrow">Kirjakohtaiset tiedot</p><h2 id="book-analysis-title">Book Analysis</h2></div>
+					<div class="analysis-controls">
+						<label for="book-search">Search by title or author</label>
+						<input id="book-search" type="search" placeholder="Search books" />
+						<label for="book-sort">Sort by</label>
+						<select id="book-sort">
+							<option value="title">Title</option><option value="rating">Rating</option>
+							<option value="duration">Reading duration</option><option value="finished">Finish date</option>
+						</select>
+					</div>
+				</div>
+			<p id="book-analysis-empty" class="analysis-empty" hidden>No books match your search.</p>
+			<div class="table-scroll">
+				<table id="book-analysis-table">
+					<thead><tr><th scope="col">Book</th><th scope="col">Status</th><th scope="col">Started</th><th scope="col">Finished</th><th scope="col">Duration</th><th scope="col">Rating</th><th scope="col">Events</th><th scope="col">Notes / review</th></tr></thead>
+					<tbody>
+						{analyticsDataset.books.map((book) => (
+							<tr data-title={book.title.toLocaleLowerCase()} data-author={book.author.toLocaleLowerCase()} data-rating={book.rating ?? ''} data-duration={book.readingDays ?? ''} data-finished={book.finishedOn ?? ''}>
+								<td><a href={withBase(`books/${book.bookId}/`)}>{book.title}</a><span class="book-author">{book.author}</span></td>
+								<td>{book.status ? statusLabels[book.status] : 'Unavailable'}</td>
+								<td>{book.startedOn ?? '—'}</td><td>{book.finishedOn ?? '—'}</td>
+									<td>{book.readingDays !== undefined ? `${book.readingDays} ${book.readingDays === 1 ? 'day' : 'days'}` : '—'}</td>
+								<td>{book.rating !== undefined ? `${book.rating}/5` : '—'}</td>
+								<td>{book.readingEventCount}</td>
+								<td>{book.hasNotesOrReview ? <a href={withBase(`books/${book.bookId}/`)}>View details</a> : '—'}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
 			</section>
 
 			<footer class="site-footer">
@@ -133,7 +170,7 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 	.filter-grid label { display: grid; gap: 0.4rem; color: #62665e; font: 600 0.72rem Arial, sans-serif; }
 	.filter-grid select { width: 100%; min-width: 0; padding: 0.7rem 0.55rem; border: 1px solid #d0d6cc; border-radius: 0; background: #fbfaf6; color: #262c25; font: 0.82rem Arial, sans-serif; }
 	.filter-note { margin: 1rem 0 0; color: #77796f; font: 0.75rem/1.5 Arial, sans-serif; }
-	.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.9rem; margin: 1rem 0; }
+	.kpi-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.9rem; margin: 1rem 0; }
 	.kpi-card { min-height: 130px; padding: 1.1rem 1.2rem; border: 1px solid #d9ded3; background: rgb(255 255 255 / 32%); }
 	.kpi-card p { margin: 0 0 0.65rem; color: #62665e; font: 600 0.78rem Arial, sans-serif; }
 	.kpi-card strong { display: block; color: #263c30; font-size: 2.15rem; font-weight: 400; letter-spacing: -0.05em; }
@@ -149,12 +186,26 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 	.chart-frame-authors { height: 350px; }
 	.chart-frame canvas { cursor: pointer; }
 	.chart-empty { padding: 3.5rem 1rem; color: #74776f; font-size: 0.95rem; line-height: 1.5; text-align: center; }
+	.book-analysis { margin: 0 0 3.5rem; padding: 1.4rem; border: 1px solid #d9ded3; background: rgb(255 255 255 / 32%); }
+	.analysis-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+	.analysis-heading h2 { margin: 0; font-size: 1.6rem; font-weight: 400; }
+	.analysis-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font: 0.75rem Arial, sans-serif; }
+	.analysis-controls input, .analysis-controls select { padding: 0.65rem; border: 1px solid #d0d6cc; background: #fbfaf6; color: #262c25; font: 0.8rem Arial, sans-serif; }
+	.analysis-controls input { min-width: 12rem; }
+	.table-scroll { overflow-x: auto; }
+	table { width: 100%; border-collapse: collapse; text-align: left; font: 0.82rem/1.45 Arial, sans-serif; }
+	th, td { padding: 0.8rem 0.65rem; border-bottom: 1px solid #d9ded3; vertical-align: top; white-space: nowrap; }
+	th { color: #58705a; font-size: 0.7rem; }
+	td:first-child { white-space: normal; min-width: 12rem; }
+	td a { color: #36533d; text-underline-offset: 3px; }
+	.book-author { display: block; margin-top: 0.2rem; color: #77796f; font-size: 0.74rem; }
+	.analysis-empty { color: #74776f; font-size: 0.9rem; }
 	.site-footer { min-height: 76px; gap: 1rem; border-top: 1px solid #d9ded3; color: #77796f; font: 0.78rem Arial, sans-serif; }
 	.site-footer p { margin: 0; }
 	[hidden] { display: none !important; }
 	@media (max-width: 850px) {
 		.filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-		.kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 	}
 	@media (max-width: 620px) {
 		.page-shell { width: min(100% - 2rem, 520px); }
@@ -164,6 +215,9 @@ const analyticsJson = JSON.stringify({ dataset: analyticsDataset }).replace(/</g
 		.filter-heading { align-items: flex-start; }
 		.filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		.chart-grid { grid-template-columns: 1fr; }
+		.analysis-heading { align-items: flex-start; flex-direction: column; }
+		.analysis-controls { align-items: flex-start; }
+		.analysis-controls input { min-width: 100%; }
 		.chart-panel-wide { grid-column: auto; }
 		.chart-heading { align-items: flex-start; }
 		.chart-frame { height: 230px; }
