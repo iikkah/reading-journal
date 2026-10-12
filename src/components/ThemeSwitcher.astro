@@ -30,13 +30,14 @@ const showSwitcher = import.meta.env.DEV;
 	}
 
 	if (themeSelect) {
-		let savedTheme = 'editorial';
+		const productionTheme = document.documentElement.dataset.theme ?? 'editorial';
+		let savedTheme = productionTheme;
 		try {
 			savedTheme = localStorage.getItem(storageKey) ?? savedTheme;
 		} catch {
 			// Keep the default theme when browser storage is unavailable.
 		}
-		if (!themes.includes(savedTheme)) savedTheme = 'editorial';
+		if (!themes.includes(savedTheme)) savedTheme = productionTheme;
 		document.documentElement.dataset.theme = savedTheme;
 		themeSelect.value = savedTheme;
 		themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));

@@ -3,6 +3,7 @@ import { books, readingEvents } from '../data/reading-data';
 import { getRatingForBook } from '../data/reviews';
 import { withBase } from '../utils/urls';
 import ThemeSwitcher from '../components/ThemeSwitcher.astro';
+import { productionTheme } from '../config/theme';
 
 
 
@@ -27,7 +28,7 @@ import '../styles/home.css';
 ---
 
 <!doctype html>
-<html lang="en" data-theme="editorial">
+<html lang="en" data-theme={productionTheme}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />

@@ -4,6 +4,7 @@ import { books, readingEvents } from '../../data/reading-data';
 import { getReviewForBook } from '../../data/reviews';
 import { withBase } from '../../utils/urls';
 import ThemeSwitcher from '../../components/ThemeSwitcher.astro';
+import { productionTheme } from '../../config/theme';
 
 export function getStaticPaths() {
 	return books.map((book) => ({
@@ -74,7 +75,7 @@ import '../../styles/book-detail.css';
 
 
 <!doctype html>
-<html lang="en" data-theme="editorial">
+<html lang="en" data-theme={productionTheme}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
