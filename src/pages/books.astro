@@ -23,6 +23,13 @@ const catalogue = [...books].sort((a, b) => {
 	if (bDate) return 1;
 	return a.title.localeCompare(b.title);
 });
+
+const currentlyReading = catalogue.filter(
+	(book) => latestEventByBook.get(book.book_id)?.status === 'reading',
+);
+const readBooks = catalogue.filter(
+	(book) => latestEventByBook.get(book.book_id)?.status === 'read',
+);
 ---
 
 <!doctype html>
@@ -34,7 +41,7 @@ const catalogue = [...books].sort((a, b) => {
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Books in my personal reading journal." />
-		<title>Kirjat · Reading Journal</title>
+		<title>Kirjat · Eräänlainen päiväkirja</title>
 	</head>
 	<body>
 		<main class="page-shell">
@@ -49,10 +56,14 @@ const catalogue = [...books].sort((a, b) => {
 				<p class="intro-copy">Lukemani kirjat vuodesta 2026 alkaen listattuna. Oletusjärjestys uusimmasta luetusta vanhimpaan.</p>
 			</section>
 
-			<section class="book-section" aria-label="Book catalogue">
-				{catalogue.length > 0 ? (
+			<section class="book-section" aria-labelledby="currently-reading-title">
+				<div class="section-heading">
+					<h2 id="currently-reading-title">Tällä hetkellä työn alla</h2>
+					<span>{currentlyReading.length}</span>
+				</div>
+				{currentlyReading.length > 0 ? (
 					<ol class="book-list">
-						{catalogue.map((book, index) => {
+						{currentlyReading.map((book, index) => {
 							const latestEvent = latestEventByBook.get(book.book_id);
 							const date = latestEvent?.finished_on || latestEvent?.started_on;
 							const rating = getRatingForBook(book.book_id);
@@ -66,13 +77,44 @@ const catalogue = [...books].sort((a, b) => {
 											{rating !== undefined && <span class="book-rating" aria-label={`Rating: ${rating} out of 5`}> · {rating}/5</span>}
 										</p>
 									</div>
-									{date && <time datetime={date}>{date}</time>}
+									{date && <time datetime={date}>Aloitettu {date}</time>}
 								</li>
 							);
 						})}
 					</ol>
 				) : (
-					<p class="empty-state">Books will appear here once you add them to books.csv.</p>
+					<p class="empty-state">No books in progress right now. Add a reading event with status <code>reading</code> to show a book here.</p>
+				)}
+			</section>
+
+			<section class="book-section" aria-labelledby="read-books-title">
+				<div class="section-heading">
+					<h2 id="read-books-title">Luetut kirjat</h2>
+					<span>{readBooks.length}</span>
+				</div>
+				{readBooks.length > 0 ? (
+					<ol class="book-list">
+						{readBooks.map((book, index) => {
+							const latestEvent = latestEventByBook.get(book.book_id);
+							const date = latestEvent?.finished_on || latestEvent?.started_on;
+							const rating = getRatingForBook(book.book_id);
+							return (
+								<li class="book-row">
+									<span class="book-number" aria-hidden="true">{String(index + 1)}</span>
+									<div class="book-details">
+										<h2><a href={withBase(`books/${book.book_id}/`)}>{book.title}</a></h2>
+										<p>
+											{book.author}
+											{rating !== undefined && <span class="book-rating" aria-label={`Rating: ${rating} out of 5`}> · {rating}/5</span>}
+										</p>
+									</div>
+									{date && <time datetime={date}>Luettu {date}</time>}
+								</li>
+							);
+						})}
+					</ol>
+				) : (
+					<p class="empty-state">No finished books to show yet. Mark a completed reading event as <code>read</code> in reading_events.csv.</p>
 				)}
 			</section>
 
@@ -111,7 +153,10 @@ const catalogue = [...books].sort((a, b) => {
 	}
 	h1 { margin: 0; font-size: clamp(2.8rem, 7vw, 5.5rem); font-weight: 400; letter-spacing: -0.06em; line-height: 1; }
 	.intro-copy { margin: 1.4rem 0 0; color: #62665e; font-size: 1.1rem; line-height: 1.7; }
-	.book-section { padding: 2rem 0 5rem; border-top: 1px solid #d9ded3; }
+	.book-section { padding: 2rem 0 3.5rem; border-top: 1px solid #d9ded3; }
+	.section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+	.section-heading h2 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.3rem); font-weight: 400; letter-spacing: -0.04em; }
+	.section-heading span { color: #74816f; font-family: Arial, sans-serif; font-size: 0.8rem; }
 	.book-list { margin: 0; padding: 0; list-style: none; }
 	.book-row {
 		display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; align-items: center; gap: 1rem;
