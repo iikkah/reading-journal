@@ -31,29 +31,26 @@ const history = readingEvents
 	})
 	.map(({ event }) => event);
 
-const metadata = [
-  { label: 'Publication year', value: book.publication_year },
-  { label: 'ISBN', value: book.isbn },
-  { label: 'Format', value: book.format },
-  { label: 'Notes', value: book.notes },
-  { label: 'Language', value: book.language },
-].filter(
-  (item): item is { label: string; value: string } =>
-    Boolean(item.value)
-);
+const metadataLabels: Record<string, string> = {
+	publication_year: 'Julkaisuvuosi',
+	isbn: 'ISBN',
+	format: 'Formaatti',
+	notes: 'Muistiinpanot',
+	language: 'Kieli',
+};
+
+const metadata = Object.entries(book)
+	.filter(([field, value]) => !['book_id', 'title', 'author'].includes(field) && value !== undefined && value !== '')
+	.map(([key, value]) => ({
+		key,
+		label: metadataLabels[key] ?? key.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()),
+		value: String(value),
+	}));
 
 const statusLabels = {
 	read: 'Luettu',
 	reading: 'Kesken',
 	abandoned: 'Lopetettu',
-};
-
-const labelTranslation: Record<string, string> = {
-  'Publication year': 'Julkaisuvuosi',
-  Format: 'Formaatti',
-  Language: 'Kieli',
-  ISBN: 'ISBN',
-  Notes: 'Muistiinpanot',
 };
 
 const languageTranslation: Record<string, string> = {
@@ -110,16 +107,16 @@ import '../../styles/book-detail.css';
 							{metadata.map((item) => {
   							let value = item.value;
 
-							if (item.label === 'Language') {
+							if (item.key === 'language') {
     						value = languageTranslation[value] ?? value;
   							}
 
-  							if (item.label === 'Format') {
+							if (item.key === 'format') {
     						value = bookformat[value] ?? value;
   							}
   							return (
     						<div class="metadata-row">
-      						<dt>{labelTranslation[item.label] ?? item.label}</dt>
+								<dt>{item.label}</dt>
       						<dd>{value}</dd>
     					</div>
   					);
